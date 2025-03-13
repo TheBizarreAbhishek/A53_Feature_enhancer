@@ -1,0 +1,36 @@
+name: Build and Release A53 Feature Enhancer
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag name to build (e.g., v1.0.0)'
+        required: true
+        type: string
+
+jobs:
+  build:
+    name: Build A53 Feature Enhancer
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Create A53 Feature Enhancer ZIP
+        run: |
+          zip -r A53_Feature_Enhancer-${{ github.event.inputs.tag_name }}.zip . \
+          -x ".git*" -x ".github*" -x "README.md"
+
+      - name: Create a Tag
+        run: |
+          git tag ${{ github.event.inputs.tag_name }}
+          git push origin ${{ github.event.inputs.tag_name }}
+
+      - name: Upload Release to GitHub
+        uses: softprops/action-gh-release@v1
+        with:
+          files: A53_Feature_Enhancer-${{ github.event.inputs.tag_name }}.zip
+          tag_name: ${{ github.event.inputs.tag_name }}
+          release_name: A53 Feature Enhancer ${{ github.event.inputs.tag_name }}
+          body: |
+            New release of A53 Feature Enhancer: **${{ github.event.inputs.tag_name }}**
