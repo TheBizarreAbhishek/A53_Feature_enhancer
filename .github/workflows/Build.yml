@@ -12,9 +12,13 @@ jobs:
   build:
     name: Build A53 Feature Enhancer
     runs-on: ubuntu-20.04
+    permissions:
+      contents: write  # Give write permission to push tags
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Ensures the full repository is checked out
 
       - name: Create A53 Feature Enhancer ZIP
         run: |
@@ -23,6 +27,8 @@ jobs:
 
       - name: Create a Tag
         run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git tag ${{ github.event.inputs.tag_name }}
           git push origin ${{ github.event.inputs.tag_name }}
 
